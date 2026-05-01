@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>chogakzip — film</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F4EFE6;
+    --ink: #1C1814;
+    --warm: #B89A74;
+    --faint: #E8E2D8;
+    --mid: #9A9188;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    min-height: 100vh;
+    /* grain overlay */
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.5;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 28px 40px 0;
+    mix-blend-mode: multiply;
+  }
+
+  .nav-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-meta {
+    text-align: right;
+    color: var(--mid);
+    line-height: 1.8;
+  }
+
+  .nav-meta a {
+    color: var(--mid);
+    text-decoration: none;
+    display: block;
+    transition: color 0.2s;
+  }
+  .nav-meta a:hover { color: var(--ink); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 160px 40px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: 100vh;
+    align-items: end;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(72px, 9vw, 128px);
+    font-weight: 300;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--warm);
+  }
+
+  .hero-right {
+    align-self: end;
+    padding-bottom: 8px;
+    padding-left: 40px;
+  }
+
+  .hero-desc {
+    color: var(--mid);
+    line-height: 2;
+    max-width: 280px;
+    margin-bottom: 32px;
+  }
+
+  .hero-filmstrip {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .film-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--warm);
+    opacity: 0.6;
+  }
+
+  .film-tag {
+    color: var(--warm);
+    letter-spacing: 0.15em;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--faint);
+    margin: 0 40px;
+  }
+
+  /* ── COLLECTIONS ── */
+  .collections {
+    padding: 80px 40px 120px;
+  }
+
+  .section-label {
+    color: var(--mid);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--faint);
+  }
+
+  /* ── COLLECTION ITEM ── */
+  .collection {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    gap: 0 40px;
+    padding: 48px 0;
+    border-bottom: 1px solid var(--faint);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .collection:first-of-type { border-top: 1px solid var(--faint); }
+  .collection:hover .collection-img-wrap { opacity: 1; }
+  .collection:hover .collection-title { color: var(--warm); }
+
+  .collection-num {
+    font-size: 10px;
+    color: var(--mid);
+    padding-top: 6px;
+    letter-spacing: 0.1em;
+  }
+
+  .collection-info {}
+
+  .collection-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+    transition: color 0.3s;
+  }
+
+  .collection-meta {
+    color: var(--mid);
+    line-height: 2.2;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .collection-img-wrap {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    align-self: center;
+  }
+
+  .photo-placeholder {
+    aspect-ratio: 3/4;
+    background: var(--faint);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* shimmer effect on placeholders */
+  .photo-placeholder::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 8px; left: 8px;
+    font-size: 9px;
+    color: var(--mid);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── ABOUT ── */
+  .about {
+    padding: 120px 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .about-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 4vw, 56px);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.2;
+    color: var(--warm);
+  }
+
+  .about-text {
+    color: var(--mid);
+    line-height: 2.4;
+    max-width: 400px;
+  }
+
+  .about-text p + p { margin-top: 20px; }
+
+  .about-sig {
+    margin-top: 40px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--faint);
+    padding: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--mid);
+  }
+
+  footer a {
+    color: var(--mid);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  footer a:hover { color: var(--ink); }
+
+  .footer-right { text-align: right; line-height: 2; }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 24, 20, 0.96);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .lightbox.open { display: flex; }
+
+  .lightbox-close {
+    position: fixed;
+    top: 32px; right: 40px;
+    color: var(--mid);
+    background: none;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .lightbox-close:hover { color: var(--cream); }
+
+  .lightbox-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 80px 60px 40px;
+    max-width: 1100px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .lightbox-photo {
+    aspect-ratio: 2/3;
+    background: #2A2520;
+    position: relative;
+  }
+  .lightbox-photo::after {
+    content: attr(data-n);
+    position: absolute;
+    bottom: 8px; right: 8px;
+    font-size: 9px;
+    color: #5A5248;
+    letter-spacing: 0.1em;
+  }
+
+  .lightbox-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px 0; }
+    .hero { padding: 120px 24px 60px; grid-template-columns: 1fr; gap: 48px; min-height: auto; }
+    .hero-right { padding-left: 0; }
+    .divider, .collections, .about, footer { padding-left: 24px; padding-right: 24px; }
+    .collection { grid-template-columns: 48px 1fr; }
+    .collection-img-wrap { display: none; }
+    .about { grid-template-columns: 1fr; gap: 32px; }
+    .lightbox-grid { grid-template-columns: repeat(2, 1fr); padding: 60px 24px 24px; }
+  }
+
+  /* ── ENTRY ANIMATION ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-title { animation: fadeUp 1s ease both; }
+  .hero-right  { animation: fadeUp 1s ease 0.2s both; }
+  .section-label { animation: fadeUp 0.8s ease 0.4s both; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-name" href="#">chogakzip</a>
+  <div class="nav-meta">
+    <span>35mm · film</span>
+    <a href="https://instagram.com/chogakzip" target="_blank">@chogakzip</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1 class="hero-title">
+    film<br>
+    <em>archive</em>
+  </h1>
+  <div class="hero-right">
+    <p class="hero-desc">
+      daily life &amp; travel<br>
+      captured on film.<br>
+      fragments of ordinary moments.
+    </p>
+    <div class="hero-filmstrip">
+      <div class="film-dot"></div>
+      <div class="film-dot"></div>
+      <div class="film-dot"></div>
+      <span class="film-tag">— 35mm</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- COLLECTIONS -->
+<section class="collections">
+  <p class="section-label">collections</p>
+
+  <!-- London -->
+  <div class="collection" onclick="openLightbox('London', 6)">
+    <span class="collection-num">01</span>
+    <div class="collection-info">
+      <h2 class="collection-title">London</h2>
+      <div class="collection-meta">
+        <span>2024</span>
+        <span>35mm · Kodak Portra 400</span>
+        <span>— roll 01</span>
+      </div>
+    </div>
+    <div class="collection-img-wrap">
+      <div class="photo-placeholder" data-label="LDN 001"></div>
+      <div class="photo-placeholder" data-label="LDN 002"></div>
+    </div>
+  </div>
+
+  <!-- Japan -->
+  <div class="collection" onclick="openLightbox('Japan', 8)">
+    <span class="collection-num">02</span>
+    <div class="collection-info">
+      <h2 class="collection-title">Japan</h2>
+      <div class="collection-meta">
+        <span>2024</span>
+        <span>35mm · Fuji 400H</span>
+        <span>— roll 02</span>
+      </div>
+    </div>
+    <div class="collection-img-wrap">
+      <div class="photo-placeholder" data-label="JPN 001"></div>
+      <div class="photo-placeholder" data-label="JPN 002"></div>
+    </div>
+  </div>
+
+  <!-- Daily Life -->
+  <div class="collection" onclick="openLightbox('Daily', 10)">
+    <span class="collection-num">03</span>
+    <div class="collection-info">
+      <h2 class="collection-title">Daily</h2>
+      <div class="collection-meta">
+        <span>2023–2024</span>
+        <span>35mm · mixed rolls</span>
+        <span>— ongoing</span>
+      </div>
+    </div>
+    <div class="collection-img-wrap">
+      <div class="photo-placeholder" data-label="DAY 001"></div>
+      <div class="photo-placeholder" data-label="DAY 002"></div>
+    </div>
+  </div>
+
+  <!-- Paris -->
+  <div class="collection" onclick="openLightbox('Paris', 5)">
+    <span class="collection-num">04</span>
+    <div class="collection-info">
+      <h2 class="collection-title">Paris</h2>
+      <div class="collection-meta">
+        <span>2023</span>
+        <span>35mm · Kodak Gold 200</span>
+        <span>— roll 01</span>
+      </div>
+    </div>
+    <div class="collection-img-wrap">
+      <div class="photo-placeholder" data-label="PAR 001"></div>
+      <div class="photo-placeholder" data-label="PAR 002"></div>
+    </div>
+  </div>
+
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section class="about">
+  <div>
+    <p class="about-label">ordinary<br>moments,<br>on film.</p>
+  </div>
+  <div class="about-text">
+    <p>
+      필름으로 일상과 여행을 기록합니다.<br>
+      셔터를 누르는 순간은 단 한 번 —<br>
+      그 한 번에 집중하는 것이 필름의 매력입니다.
+    </p>
+    <p>
+      Every frame is a single chance.<br>
+      No retakes, no previews.<br>
+      Just light, time, and what's in front of the lens.
+    </p>
+    <p class="about-sig">— chogakzip</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2024 chogakzip</span>
+  <div class="footer-right">
+    <a href="https://instagram.com/chogakzip" target="_blank">instagram</a>
+    <span style="display:block; color: var(--faint);">35mm film archive</span>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">[ close ]</button>
+  <div class="lightbox-title" id="lightbox-title"></div>
+  <div class="lightbox-grid" id="lightbox-grid"></div>
+</div>
+
+<script>
+  function openLightbox(name, count) {
+    const lb = document.getElementById('lightbox');
+    const grid = document.getElementById('lightbox-grid');
+    const title = document.getElementById('lightbox-title');
+
+    title.textContent = name.toUpperCase() + ' — ' + count + ' frames';
+    grid.innerHTML = '';
+
+    for (let i = 1; i <= count; i++) {
+      const div = document.createElement('div');
+      div.className = 'lightbox-photo';
+      div.setAttribute('data-n', name.slice(0,3).toUpperCase() + ' ' + String(i).padStart(3,'0'));
+      grid.appendChild(div);
+    }
+
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+</script>
+</body>
+</html>
