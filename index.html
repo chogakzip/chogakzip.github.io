@@ -3,549 +3,318 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>chogakzip — film</title>
+<title>chogakzip</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --cream: #F4EFE6;
-    --ink: #1C1814;
-    --warm: #B89A74;
-    --faint: #E8E2D8;
-    --mid: #9A9188;
+    --bg: #EDEAE4;
+    --ink: #1A1816;
+    --mid: #9A9590;
+    --line: #D8D4CE;
   }
 
-  html { scroll-behavior: smooth; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
 
   body {
-    background: var(--cream);
+    background: var(--bg);
     color: var(--ink);
-    font-family: 'DM Mono', monospace;
-    font-weight: 300;
-    font-size: 11px;
-    letter-spacing: 0.05em;
-    min-height: 100vh;
-    /* grain overlay */
-    position: relative;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.5;
-  }
-
-  /* ── NAV ── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 28px 40px 0;
-    mix-blend-mode: multiply;
-  }
-
-  .nav-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 15px;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .nav-meta {
-    text-align: right;
-    color: var(--mid);
-    line-height: 1.8;
-  }
-
-  .nav-meta a {
-    color: var(--mid);
-    text-decoration: none;
-    display: block;
-    transition: color 0.2s;
-  }
-  .nav-meta a:hover { color: var(--ink); }
-
-  /* ── HERO ── */
-  .hero {
-    padding: 160px 40px 80px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-    min-height: 100vh;
-    align-items: end;
-  }
-
-  .hero-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(72px, 9vw, 128px);
-    font-weight: 300;
-    line-height: 0.92;
-    letter-spacing: -0.02em;
-  }
-
-  .hero-title em {
-    font-style: italic;
-    color: var(--warm);
-  }
-
-  .hero-right {
-    align-self: end;
-    padding-bottom: 8px;
-    padding-left: 40px;
-  }
-
-  .hero-desc {
-    color: var(--mid);
-    line-height: 2;
-    max-width: 280px;
-    margin-bottom: 32px;
-  }
-
-  .hero-filmstrip {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
-
-  .film-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--warm);
-    opacity: 0.6;
-  }
-
-  .film-tag {
-    color: var(--warm);
-    letter-spacing: 0.15em;
-  }
-
-  /* ── DIVIDER ── */
-  .divider {
-    height: 1px;
-    background: var(--faint);
-    margin: 0 40px;
-  }
-
-  /* ── COLLECTIONS ── */
-  .collections {
-    padding: 80px 40px 120px;
-  }
-
-  .section-label {
-    color: var(--mid);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 60px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--faint);
-  }
-
-  /* ── COLLECTION ITEM ── */
-  .collection {
-    display: grid;
-    grid-template-columns: 80px 1fr 1fr;
-    gap: 0 40px;
-    padding: 48px 0;
-    border-bottom: 1px solid var(--faint);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .collection:first-of-type { border-top: 1px solid var(--faint); }
-  .collection:hover .collection-img-wrap { opacity: 1; }
-  .collection:hover .collection-title { color: var(--warm); }
-
-  .collection-num {
+    font-family: 'Space Mono', monospace;
     font-size: 10px;
-    color: var(--mid);
-    padding-top: 6px;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
-  .collection-info {}
-
-  .collection-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(40px, 5vw, 64px);
-    font-weight: 300;
-    line-height: 1;
-    letter-spacing: -0.01em;
-    margin-bottom: 16px;
-    transition: color 0.3s;
-  }
-
-  .collection-meta {
-    color: var(--mid);
-    line-height: 2.2;
-    display: flex;
-    gap: 32px;
-    flex-wrap: wrap;
-  }
-
-  .collection-img-wrap {
-    opacity: 0;
-    transition: opacity 0.4s ease;
+  .site {
+    width: 100vw;
+    height: 100vh;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    align-self: center;
+    grid-template-rows: 44px 1fr 44px;
   }
 
-  .photo-placeholder {
-    aspect-ratio: 3/4;
-    background: var(--faint);
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* shimmer effect on placeholders */
-  .photo-placeholder::after {
-    content: attr(data-label);
-    position: absolute;
-    bottom: 8px; left: 8px;
-    font-size: 9px;
-    color: var(--mid);
-    letter-spacing: 0.1em;
-  }
-
-  /* ── ABOUT ── */
-  .about {
-    padding: 120px 40px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: start;
-  }
-
-  .about-label {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(32px, 4vw, 56px);
-    font-weight: 300;
-    font-style: italic;
-    line-height: 1.2;
-    color: var(--warm);
-  }
-
-  .about-text {
-    color: var(--mid);
-    line-height: 2.4;
-    max-width: 400px;
-  }
-
-  .about-text p + p { margin-top: 20px; }
-
-  .about-sig {
-    margin-top: 40px;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
-    font-style: italic;
-    color: var(--ink);
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    border-top: 1px solid var(--faint);
-    padding: 40px;
+  /* NAV */
+  nav {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    color: var(--mid);
+    justify-content: space-between;
+    padding: 0 28px;
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-right { display: flex; gap: 32px; color: var(--mid); }
+  .nav-right a { color: var(--mid); text-decoration: none; transition: color 0.15s; }
+  .nav-right a:hover, .nav-right a.active { color: var(--ink); }
+
+  /* MAIN */
+  main { display: grid; grid-template-columns: 200px 1fr; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-right: 1px solid var(--line);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
-  footer a {
-    color: var(--mid);
-    text-decoration: none;
-    transition: color 0.2s;
+  .collection-btn {
+    background: none; border: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    text-align: left; color: var(--mid);
+    padding: 10px 0;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: color 0.15s;
+    width: 100%;
   }
+  .collection-btn:hover { color: var(--ink); }
+  .collection-btn.active { color: var(--ink); border-bottom-color: var(--ink); }
+  .collection-btn .cnum { font-size: 9px; color: inherit; opacity: 0.6; }
+
+  .sidebar-meta { color: var(--mid); line-height: 2.2; font-size: 9px; }
+
+  /* GALLERY */
+  .gallery-wrap { position: relative; overflow: hidden; }
+
+  .collection-info {
+    position: absolute; top: 28px; left: 28px;
+    z-index: 10; pointer-events: none;
+  }
+  .cnum-big { font-size: 9px; color: var(--mid); display: block; margin-bottom: 8px; }
+  .ctitle { font-size: 11px; color: var(--ink); line-height: 1.8; }
+
+  .scroll-hint {
+    position: absolute; bottom: 28px; right: 28px;
+    color: var(--mid); font-size: 9px; z-index: 10;
+    pointer-events: none; transition: opacity 0.4s;
+  }
+
+  .gallery-track {
+    display: flex; align-items: center; gap: 10px;
+    height: 100%; padding: 0 28px;
+    overflow-x: auto; overflow-y: hidden;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none; scrollbar-width: none;
+    cursor: grab; transition: opacity 0.2s;
+  }
+  .gallery-track::-webkit-scrollbar { display: none; }
+  .gallery-track.dragging { cursor: grabbing; scroll-behavior: auto; }
+
+  .photo-card {
+    flex-shrink: 0;
+    background: var(--line);
+    position: relative; overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+  .photo-card:hover { transform: translateY(-3px); }
+
+  .photo-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  .photo-card .label {
+    position: absolute; bottom: 9px; left: 9px;
+    font-size: 8px; color: rgba(255,255,255,0.45);
+    letter-spacing: 0.12em; pointer-events: none;
+  }
+
+  /* shimmer for placeholders */
+  .photo-card::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%);
+    animation: shimmer 2.2s infinite;
+  }
+  .photo-card.has-image::after { display: none; }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* sizes */
+  .sm   { width: 150px; height: 195px; }
+  .md   { width: 210px; height: 290px; }
+  .lg   { width: 290px; height: 390px; }
+  .xl   { width: 340px; height: 440px; }
+  .sq   { width: 230px; height: 230px; }
+  .wide { width: 340px; height: 225px; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; color: var(--mid); font-size: 9px;
+  }
+  footer a { color: var(--mid); text-decoration: none; transition: color 0.15s; }
   footer a:hover { color: var(--ink); }
 
-  .footer-right { text-align: right; line-height: 2; }
-
-  /* ── LIGHTBOX ── */
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    background: rgba(28, 24, 20, 0.96);
-    z-index: 200;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 24px;
+  /* MOBILE */
+  @media (max-width: 640px) {
+    html, body { overflow: auto; }
+    .site { height: auto; grid-template-rows: 44px auto 44px; }
+    main { grid-template-columns: 1fr; }
+    .sidebar {
+      border-right: none; border-bottom: 1px solid var(--line);
+      flex-direction: row; flex-wrap: wrap; gap: 0; padding: 12px 20px;
+    }
+    .sidebar-meta { display: none; }
+    .collection-btn { width: auto; padding: 8px 12px 8px 0; border-bottom: none; }
+    .gallery-wrap { height: 65vw; min-height: 260px; }
+    .sm { width: 110px; height: 145px; }
+    .md { width: 160px; height: 220px; }
+    .lg { width: 210px; height: 280px; }
+    .xl { width: 240px; height: 310px; }
+    .sq { width: 170px; height: 170px; }
+    .wide { width: 240px; height: 160px; }
+    .collection-info { top: 14px; left: 16px; }
+    .scroll-hint { display: none; }
   }
-  .lightbox.open { display: flex; }
-
-  .lightbox-close {
-    position: fixed;
-    top: 32px; right: 40px;
-    color: var(--mid);
-    background: none;
-    border: none;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: color 0.2s;
-  }
-  .lightbox-close:hover { color: var(--cream); }
-
-  .lightbox-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    padding: 80px 60px 40px;
-    max-width: 1100px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-
-  .lightbox-photo {
-    aspect-ratio: 2/3;
-    background: #2A2520;
-    position: relative;
-  }
-  .lightbox-photo::after {
-    content: attr(data-n);
-    position: absolute;
-    bottom: 8px; right: 8px;
-    font-size: 9px;
-    color: #5A5248;
-    letter-spacing: 0.1em;
-  }
-
-  .lightbox-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 13px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--mid);
-  }
-
-  /* ── MOBILE ── */
-  @media (max-width: 768px) {
-    nav { padding: 20px 24px 0; }
-    .hero { padding: 120px 24px 60px; grid-template-columns: 1fr; gap: 48px; min-height: auto; }
-    .hero-right { padding-left: 0; }
-    .divider, .collections, .about, footer { padding-left: 24px; padding-right: 24px; }
-    .collection { grid-template-columns: 48px 1fr; }
-    .collection-img-wrap { display: none; }
-    .about { grid-template-columns: 1fr; gap: 32px; }
-    .lightbox-grid { grid-template-columns: repeat(2, 1fr); padding: 60px 24px 24px; }
-  }
-
-  /* ── ENTRY ANIMATION ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .hero-title { animation: fadeUp 1s ease both; }
-  .hero-right  { animation: fadeUp 1s ease 0.2s both; }
-  .section-label { animation: fadeUp 0.8s ease 0.4s both; }
 </style>
 </head>
 <body>
+<div class="site">
 
-<!-- NAV -->
-<nav>
-  <a class="nav-name" href="#">chogakzip</a>
-  <div class="nav-meta">
-    <span>35mm · film</span>
-    <a href="https://instagram.com/chogakzip" target="_blank">@chogakzip</a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <h1 class="hero-title">
-    film<br>
-    <em>archive</em>
-  </h1>
-  <div class="hero-right">
-    <p class="hero-desc">
-      daily life &amp; travel<br>
-      captured on film.<br>
-      fragments of ordinary moments.
-    </p>
-    <div class="hero-filmstrip">
-      <div class="film-dot"></div>
-      <div class="film-dot"></div>
-      <div class="film-dot"></div>
-      <span class="film-tag">— 35mm</span>
+  <nav>
+    <span>Chogakzip</span>
+    <div class="nav-right">
+      <a href="#" class="active">Archive</a>
+      <a href="https://instagram.com/chogakzip" target="_blank">Instagram</a>
     </div>
-  </div>
-</section>
+  </nav>
 
-<div class="divider"></div>
-
-<!-- COLLECTIONS -->
-<section class="collections">
-  <p class="section-label">collections</p>
-
-  <!-- London -->
-  <div class="collection" onclick="openLightbox('London', 6)">
-    <span class="collection-num">01</span>
-    <div class="collection-info">
-      <h2 class="collection-title">London</h2>
-      <div class="collection-meta">
-        <span>2024</span>
-        <span>35mm · Kodak Portra 400</span>
-        <span>— roll 01</span>
+  <main>
+    <div class="sidebar">
+      <div>
+        <button class="collection-btn active" onclick="show('london')" data-id="london">
+          London <span class="cnum">(01)</span>
+        </button>
+        <button class="collection-btn" onclick="show('japan')" data-id="japan">
+          Japan <span class="cnum">(02)</span>
+        </button>
+        <button class="collection-btn" onclick="show('daily')" data-id="daily">
+          Daily <span class="cnum">(03)</span>
+        </button>
+        <button class="collection-btn" onclick="show('paris')" data-id="paris">
+          Paris <span class="cnum">(04)</span>
+        </button>
+        <button class="collection-btn" onclick="show('newzealand')" data-id="newzealand">
+          New Zealand <span class="cnum">(05)</span>
+        </button>
+      </div>
+      <div class="sidebar-meta">
+        35mm Film<br>
+        2023–2024<br><br>
+        Kodak / Fuji<br>
+        Mixed Rolls
       </div>
     </div>
-    <div class="collection-img-wrap">
-      <div class="photo-placeholder" data-label="LDN 001"></div>
-      <div class="photo-placeholder" data-label="LDN 002"></div>
-    </div>
-  </div>
 
-  <!-- Japan -->
-  <div class="collection" onclick="openLightbox('Japan', 8)">
-    <span class="collection-num">02</span>
-    <div class="collection-info">
-      <h2 class="collection-title">Japan</h2>
-      <div class="collection-meta">
-        <span>2024</span>
-        <span>35mm · Fuji 400H</span>
-        <span>— roll 02</span>
+    <div class="gallery-wrap">
+      <div class="collection-info">
+        <span class="cnum-big" id="infoNum">(01)</span>
+        <div class="ctitle" id="infoTitle">London<br>2024</div>
       </div>
+      <div class="scroll-hint" id="scrollHint">Drag to explore →</div>
+      <div class="gallery-track" id="track"></div>
     </div>
-    <div class="collection-img-wrap">
-      <div class="photo-placeholder" data-label="JPN 001"></div>
-      <div class="photo-placeholder" data-label="JPN 002"></div>
-    </div>
-  </div>
+  </main>
 
-  <!-- Daily Life -->
-  <div class="collection" onclick="openLightbox('Daily', 10)">
-    <span class="collection-num">03</span>
-    <div class="collection-info">
-      <h2 class="collection-title">Daily</h2>
-      <div class="collection-meta">
-        <span>2023–2024</span>
-        <span>35mm · mixed rolls</span>
-        <span>— ongoing</span>
-      </div>
-    </div>
-    <div class="collection-img-wrap">
-      <div class="photo-placeholder" data-label="DAY 001"></div>
-      <div class="photo-placeholder" data-label="DAY 002"></div>
-    </div>
-  </div>
+  <footer>
+    <span id="footerText">London — — frames</span>
+    <a href="mailto:hello@chogakzip.com">Contact</a>
+  </footer>
 
-  <!-- Paris -->
-  <div class="collection" onclick="openLightbox('Paris', 5)">
-    <span class="collection-num">04</span>
-    <div class="collection-info">
-      <h2 class="collection-title">Paris</h2>
-      <div class="collection-meta">
-        <span>2023</span>
-        <span>35mm · Kodak Gold 200</span>
-        <span>— roll 01</span>
-      </div>
-    </div>
-    <div class="collection-img-wrap">
-      <div class="photo-placeholder" data-label="PAR 001"></div>
-      <div class="photo-placeholder" data-label="PAR 002"></div>
-    </div>
-  </div>
-
-</section>
-
-<div class="divider"></div>
-
-<!-- ABOUT -->
-<section class="about">
-  <div>
-    <p class="about-label">ordinary<br>moments,<br>on film.</p>
-  </div>
-  <div class="about-text">
-    <p>
-      필름으로 일상과 여행을 기록합니다.<br>
-      셔터를 누르는 순간은 단 한 번 —<br>
-      그 한 번에 집중하는 것이 필름의 매력입니다.
-    </p>
-    <p>
-      Every frame is a single chance.<br>
-      No retakes, no previews.<br>
-      Just light, time, and what's in front of the lens.
-    </p>
-    <p class="about-sig">— chogakzip</p>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <span>© 2024 chogakzip</span>
-  <div class="footer-right">
-    <a href="https://instagram.com/chogakzip" target="_blank">instagram</a>
-    <span style="display:block; color: var(--faint);">35mm film archive</span>
-  </div>
-</footer>
-
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox">
-  <button class="lightbox-close" onclick="closeLightbox()">[ close ]</button>
-  <div class="lightbox-title" id="lightbox-title"></div>
-  <div class="lightbox-grid" id="lightbox-grid"></div>
 </div>
-
 <script>
-  function openLightbox(name, count) {
-    const lb = document.getElementById('lightbox');
-    const grid = document.getElementById('lightbox-grid');
-    const title = document.getElementById('lightbox-title');
-
-    title.textContent = name.toUpperCase() + ' — ' + count + ' frames';
-    grid.innerHTML = '';
-
-    for (let i = 1; i <= count; i++) {
-      const div = document.createElement('div');
-      div.className = 'lightbox-photo';
-      div.setAttribute('data-n', name.slice(0,3).toUpperCase() + ' ' + String(i).padStart(3,'0'));
-      grid.appendChild(div);
+  const data = {
+    london: {
+      num:'(01)', title:'London<br>2024', film:'Kodak Portra 400',
+      frames:[
+        {s:'lg',l:'LDN 001'},{s:'sm',l:'LDN 002'},{s:'md',l:'LDN 003'},
+        {s:'xl',l:'LDN 004'},{s:'sm',l:'LDN 005'},{s:'wide',l:'LDN 006'},
+        {s:'md',l:'LDN 007'},{s:'sq',l:'LDN 008'},
+      ]
+    },
+    japan: {
+      num:'(02)', title:'Japan<br>2024', film:'Fuji 400H',
+      frames:[
+        {s:'md',l:'JPN 001'},{s:'xl',l:'JPN 002'},{s:'sm',l:'JPN 003'},
+        {s:'lg',l:'JPN 004'},{s:'sq',l:'JPN 005'},{s:'md',l:'JPN 006'},
+        {s:'sm',l:'JPN 007'},{s:'wide',l:'JPN 008'},{s:'lg',l:'JPN 009'},
+      ]
+    },
+    daily: {
+      num:'(03)', title:'Daily<br>2023–2024', film:'Mixed',
+      frames:[
+        {s:'sq',l:'DAY 001'},{s:'md',l:'DAY 002'},{s:'sm',l:'DAY 003'},
+        {s:'lg',l:'DAY 004'},{s:'wide',l:'DAY 005'},{s:'sm',l:'DAY 006'},
+        {s:'xl',l:'DAY 007'},{s:'md',l:'DAY 008'},{s:'sq',l:'DAY 009'},{s:'sm',l:'DAY 010'},
+      ]
+    },
+    paris: {
+      num:'(04)', title:'Paris<br>2023', film:'Kodak Gold 200',
+      frames:[
+        {s:'xl',l:'PAR 001'},{s:'sm',l:'PAR 002'},{s:'md',l:'PAR 003'},
+        {s:'lg',l:'PAR 004'},{s:'sq',l:'PAR 005'},{s:'wide',l:'PAR 006'},
+      ]
+    },
+    newzealand: {
+      num:'(05)', title:'New Zealand<br>2024', film:'35mm Film',
+      frames:[
+        {s:'wide',l:'NZ 001', img:'new-zealand-001.jpg'},
+      ]
     }
+  };
 
-    lb.classList.add('open');
-    document.body.style.overflow = 'hidden';
+  function show(id) {
+    const col = data[id];
+    const track = document.getElementById('track');
+
+    document.querySelectorAll('.collection-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.id === id));
+
+    document.getElementById('infoNum').textContent = col.num;
+    document.getElementById('infoTitle').innerHTML = col.title;
+    document.getElementById('footerText').textContent =
+      col.title.replace('<br>',' ').replace(/\d{4}.*/, '').trim() +
+      ' \u2014 ' + col.frames.length + ' frames';
+
+    track.style.opacity = '0';
+    setTimeout(() => {
+      track.innerHTML = '';
+      track.scrollLeft = 0;
+      col.frames.forEach(f => {
+        const d = document.createElement('div');
+        d.className = `photo-card ${f.s}`;
+        if (f.img) {
+          d.style.backgroundImage = `url('${f.img}')`;
+          d.style.backgroundSize = 'cover';
+          d.style.backgroundPosition = 'center';
+        }
+        d.innerHTML = `<span class="label">${f.l}</span>`;
+        track.appendChild(d);
+      });
+      track.style.opacity = '1';
+      document.getElementById('scrollHint').style.opacity = '1';
+    }, 180);
   }
 
-  function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  document.getElementById('lightbox').addEventListener('click', function(e) {
-    if (e.target === this) closeLightbox();
+  // drag scroll
+  const track = document.getElementById('track');
+  let down = false, sx, sl;
+  track.addEventListener('mousedown', e => { down=true; sx=e.pageX-track.offsetLeft; sl=track.scrollLeft; track.classList.add('dragging'); });
+  window.addEventListener('mouseup', () => { down=false; track.classList.remove('dragging'); });
+  track.addEventListener('mousemove', e => {
+    if(!down) return; e.preventDefault();
+    track.scrollLeft = sl - (e.pageX - track.offsetLeft - sx) * 1.1;
   });
+  track.addEventListener('scroll', () => {
+    document.getElementById('scrollHint').style.opacity = '0';
+  }, {once:true});
 
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeLightbox();
-  });
+  show('london');
 </script>
 </body>
 </html>
