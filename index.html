@@ -205,7 +205,7 @@
       </div>
       <div class="sidebar-meta">
         35mm Film<br>
-        2023–2024<br><br>
+        2023–2026<br><br>
         Kodak / Fuji<br>
         Mixed Rolls
       </div>
@@ -261,10 +261,16 @@
       ]
     },
     newzealand: {
-      num:'(05)', title:'New Zealand<br>2024', film:'35mm Film',
-      frames:[
-        {s:'wide',l:'NZ 001', img:'new-zealand-001.jpg'},
-      ]
+      num:'(05)', title:'New Zealand<br>2026', film:'Kodak Portra 400',
+      frames: Array.from({length: 38}, (_, i) => {
+        const sizes = ['lg','sm','md','xl','wide','sq','sm','lg','md'];
+        const num = String(i+1).padStart(4,'0');
+        return {
+          s: sizes[i % sizes.length],
+          l: 'NZ ' + String(i+1).padStart(3,'0'),
+          img: 'images/newzealand/00037375' + num + '.jpeg'
+        };
+      })
     }
   };
 
@@ -289,6 +295,7 @@
         const d = document.createElement('div');
         d.className = `photo-card ${f.s}`;
         if (f.img) {
+          d.classList.add('has-image');
           d.style.backgroundImage = `url('${f.img}')`;
           d.style.backgroundSize = 'cover';
           d.style.backgroundPosition = 'center';
