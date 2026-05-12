@@ -84,17 +84,17 @@
 
   /* ─────────── RECENT WORK (FEATURED 3-UP) ─────────── */
   .featured {
-    max-width: 1280px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 16px 24px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    align-items: stretch;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 48px;
+    align-items: start;
   }
 
   .feature-large {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 2 / 3;   /* portrait — person centered crop */
     background: var(--line);
     overflow: hidden;
     opacity: 0;
@@ -104,16 +104,19 @@
   .feature-large img {
     width: 100%; height: 100%;
     object-fit: cover;
+    object-position: center;
     display: block;
   }
 
   .feature-stack {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    gap: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 80px;          /* breathing room between top + bottom */
+    padding-top: 8%;     /* nudge stack down a bit so it doesn't crowd the top */
   }
 
   .feature-small {
+    aspect-ratio: 3 / 2;  /* clean landscape, smaller than left */
     background: var(--line);
     overflow: hidden;
     opacity: 0;
@@ -127,13 +130,33 @@
   }
 
   .featured-caption {
-    max-width: 1280px;
-    margin: 32px auto 0;
+    max-width: 1200px;
+    margin: 40px auto 0;
     padding: 0 24px;
     text-align: center;
     color: var(--mid);
     font-size: 12px;
     letter-spacing: 0.06em;
+  }
+
+  .more-wrap {
+    text-align: center;
+    margin-top: 56px;
+  }
+  .more-link {
+    display: inline-block;
+    padding: 12px 32px;
+    border: 1px solid var(--line);
+    color: var(--mid);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    transition: border-color 0.25s ease, color 0.25s ease, padding 0.25s ease;
+  }
+  .more-link:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+    padding-left: 40px;
+    padding-right: 40px;
   }
 
   /* ─────────── ARCHIVE LIST ─────────── */
@@ -302,9 +325,11 @@
       gap: 16px;
       padding: 8px 16px;
     }
-    .feature-stack { gap: 16px; }
-    .feature-large { aspect-ratio: 4 / 5; }
-    .feature-small { aspect-ratio: 16 / 10; }
+    .feature-stack { gap: 16px; padding-top: 0; }
+    .feature-large { aspect-ratio: 2 / 3; }
+    .feature-small { aspect-ratio: 3 / 2; }
+    .more-link { padding: 10px 24px; font-size: 11px; }
+    .more-link:hover { padding-left: 30px; padding-right: 30px; }
     .gallery-grid { columns: 2; column-gap: 12px; }
     .photo-card { margin-bottom: 12px; }
     .archive-row { padding: 18px 0; }
@@ -358,6 +383,9 @@
     </div>
     <div class="featured-caption">
       Wanaka · 2026 · Kodak Portra 400
+    </div>
+    <div class="more-wrap">
+      <a href="#wanaka" class="more-link">+ View All 38 Frames</a>
     </div>
   </section>
 
@@ -447,9 +475,9 @@
   */
   const recent = projects.find(p => p.id === 'wanaka');
   const featured = [
-    recent.photos[0],   // large left
-    recent.photos[14],  // top right
-    recent.photos[26]   // bottom right
+    recent.photos[25],  // large left  (000373750026 — person centered, portrait crop)
+    recent.photos[15],  // top right   (000373750016)
+    recent.photos[10]   // bottom right(000373750011)
   ];
 
   function loadFeatured() {
