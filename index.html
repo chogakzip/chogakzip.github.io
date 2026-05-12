@@ -90,11 +90,12 @@
     display: grid;
     grid-template-columns: 1.1fr 1fr;
     gap: 48px;
-    align-items: start;
+    align-items: stretch;  /* both columns same height → top & bottom aligned */
   }
 
   .feature-large {
-    aspect-ratio: 2 / 3;   /* portrait — person centered crop */
+    aspect-ratio: 2 / 3;     /* portrait — person on right */
+    width: 100%;
     background: var(--line);
     overflow: hidden;
     opacity: 0;
@@ -104,19 +105,19 @@
   .feature-large img {
     width: 100%; height: 100%;
     object-fit: cover;
-    object-position: center;
+    object-position: right center;  /* crop toward right side */
     display: block;
   }
 
   .feature-stack {
     display: flex;
     flex-direction: column;
-    gap: 80px;          /* breathing room between top + bottom */
-    padding-top: 8%;     /* nudge stack down a bit so it doesn't crowd the top */
+    justify-content: space-between;  /* top + bottom edges align with left image */
   }
 
   .feature-small {
-    aspect-ratio: 3 / 2;  /* clean landscape, smaller than left */
+    aspect-ratio: 3 / 2;
+    width: 100%;
     background: var(--line);
     overflow: hidden;
     opacity: 0;
