@@ -267,6 +267,39 @@
     font-size: 14px;
   }
 
+  /* sub-section headers (e.g., Wanaka / Milford Sound inside New Zealand) */
+  .sub-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    max-width: 720px;
+    margin: 64px auto 24px;
+    padding: 18px 0 12px;
+    border-top: 1px solid var(--line);
+    text-transform: uppercase;
+  }
+  .sub-section-header:first-child {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+  }
+  .sub-section-name {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    color: var(--ink);
+  }
+  .sub-section-count {
+    color: var(--soft);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+  .empty-sub {
+    padding: 40px 24px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+
   /* ─────────── INFO PAGES (ABOUT / CONTACT) ─────────── */
   .info-page {
     max-width: 560px;
@@ -410,7 +443,7 @@
       Wanaka · 2026 · Kodak Portra 400
     </div>
     <div class="more-wrap">
-      <a href="#wanaka" class="more-link">+ View All 38 Frames</a>
+      <a href="#newzealand" class="more-link">+ View New Zealand 2026</a>
     </div>
   </section>
 
@@ -427,7 +460,7 @@
         <h2 class="collection-title" id="colTitle"></h2>
         <div class="collection-meta" id="colMeta"></div>
       </div>
-      <div class="gallery-grid" id="gridContainer"></div>
+      <div id="gridContainer"></div>
     </div>
   </section>
 
@@ -488,10 +521,19 @@
     { id: 'seoul',  city: 'Seoul',  year: '2023–2024', film: 'Mixed Rolls',      photos: [] },
     { id: 'paris',  city: 'Paris',  year: '2023',      film: 'Kodak Gold 200',   photos: [] },
     {
-      id: 'wanaka', city: 'Wanaka', year: '2026', film: 'Kodak Portra 400',
-      photos: Array.from({length: 38}, (_, i) =>
-        'images/wanaka/00037375' + String(i+1).padStart(4, '0') + '.jpeg'
-      )
+      id: 'newzealand', city: 'New Zealand', year: '2026', film: 'Kodak Portra 400',
+      // Multi-section project: each section gets its own header + grid
+      sections: [
+        {
+          name: 'Wanaka',
+          photos: Array.from({length: 38}, (_, i) =>
+            'images/newzealand/wanaka/00037375' + String(i+1).padStart(4, '0') + '.jpeg'
+          )
+        },
+        { name: 'Milford Sound', photos: [] },
+        { name: 'Glenorchy',     photos: [] },
+        { name: 'Queenstown',    photos: [] }
+      ]
     }
   ];
 
@@ -499,11 +541,12 @@
      Want to change which 3 photos appear here?
      Just edit the array below — any wanaka image path works.
   */
-  const recent = projects.find(p => p.id === 'wanaka');
+  const nz = projects.find(p => p.id === 'newzealand');
+  const wanakaPhotos = nz.sections.find(s => s.name === 'Wanaka').photos;
   const featured = [
-    recent.photos[25],  // large left  (000373750026 — person centered, portrait crop)
-    recent.photos[15],  // top right   (000373750016)
-    recent.photos[10]   // bottom right(000373750011)
+    wanakaPhotos[25],  // large left  (000373750026 — person on right)
+    wanakaPhotos[15],  // top right   (000373750016)
+    wanakaPhotos[10]   // bottom right(000373750011)
   ];
 
   function loadFeatured() {
@@ -520,7 +563,7 @@
       img.onerror = () => wrap.classList.add('loaded');
     });
   }
-  if (recent.photos.length > 0) loadFeatured();
+  if (wanakaPhotos.length > 0) loadFeatured();
 
   /* ─────────── ARCHIVE LIST ─────────── */
   const archiveEl = document.getElementById('archiveList');
@@ -535,35 +578,76 @@
   });
 
   /* ─────────── COLLECTION RENDER ─────────── */
+  function makePhotoCard(src, alt) {
+    const card = document.createElement('div');
+    card.className = 'photo-card';
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = alt;
+    img.loading = 'lazy';
+    img.addEventListener('load',  () => card.classList.add('loaded'));
+    img.addEventListener('error', () => card.classList.add('loaded'));
+    card.appendChild(img);
+    return card;
+  }
+
   function renderCollection(project) {
     document.getElementById('colTitle').textContent = project.city;
-    const count = project.photos.length;
-    const frameLabel = count > 0 ? count + ' frames' : 'coming soon';
+
+    // Total frame count works for both single and multi-section projects
+    const totalCount = project.sections
+      ? project.sections.reduce((sum, s) => sum + s.photos.length, 0)
+      : project.photos.length;
+    const frameLabel = totalCount > 0 ? totalCount + ' frames' : 'coming soon';
     document.getElementById('colMeta').textContent =
       project.year + ' · ' + project.film + ' · ' + frameLabel;
 
-    const grid = document.getElementById('gridContainer');
-    grid.innerHTML = '';
+    const container = document.getElementById('gridContainer');
+    container.innerHTML = '';
 
-    if (count === 0) {
+    if (project.sections) {
+      // Multi-section: render each section with its own header + grid
+      project.sections.forEach((section) => {
+        const header = document.createElement('div');
+        header.className = 'sub-section-header';
+        const cnt = section.photos.length;
+        const cntLabel = cnt > 0 ? cnt + ' frames' : 'coming soon';
+        header.innerHTML =
+          '<span class="sub-section-name">' + section.name + '</span>' +
+          '<span class="sub-section-count">' + cntLabel + '</span>';
+        container.appendChild(header);
+
+        if (cnt > 0) {
+          const grid = document.createElement('div');
+          grid.className = 'gallery-grid';
+          section.photos.forEach((src, i) =>
+            grid.appendChild(makePhotoCard(src, section.name + ' ' + (i + 1)))
+          );
+          container.appendChild(grid);
+        } else {
+          const empty = document.createElement('div');
+          empty.className = 'empty empty-sub';
+          empty.textContent = 'Coming soon';
+          container.appendChild(empty);
+        }
+      });
+      return;
+    }
+
+    // Single-section project (the default case)
+    if (totalCount === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty';
       empty.textContent = 'No frames yet — coming soon';
-      grid.appendChild(empty);
+      container.appendChild(empty);
       return;
     }
-    project.photos.forEach((src, i) => {
-      const card = document.createElement('div');
-      card.className = 'photo-card';
-      const img = document.createElement('img');
-      img.src = src;
-      img.alt = project.city + ' ' + (i + 1);
-      img.loading = 'lazy';
-      img.addEventListener('load',  () => card.classList.add('loaded'));
-      img.addEventListener('error', () => card.classList.add('loaded'));
-      card.appendChild(img);
-      grid.appendChild(card);
-    });
+    const grid = document.createElement('div');
+    grid.className = 'gallery-grid';
+    project.photos.forEach((src, i) =>
+      grid.appendChild(makePhotoCard(src, project.city + ' ' + (i + 1)))
+    );
+    container.appendChild(grid);
   }
 
   /* ─────────── ROUTING ─────────── */
