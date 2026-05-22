@@ -530,9 +530,14 @@
             'images/newzealand/wanaka/00037375' + String(i+1).padStart(4, '0') + '.jpeg'
           )
         },
-        { name: 'Milford Sound', photos: [] },
-        { name: 'Glenorchy',     photos: [] },
-        { name: 'Queenstown',    photos: [] }
+        {
+          name: 'Milford Sound',
+          photos: Array.from({length: 18}, (_, i) =>
+            'images/newzealand/milford-sound/milford-sound-' + String(i+1).padStart(2, '0') + '.jpg'
+          )
+        },
+        { name: 'Glenorchy',  photos: [] },
+        { name: 'Queenstown', photos: [] }
       ]
     }
   ];
